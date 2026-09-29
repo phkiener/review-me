@@ -8,6 +8,7 @@ var features = new List<IFeature>
     new ReviewUncommitted(),
     new ReviewDiff(),
     new ReviewFile(),
+    new ReviewAutomatic(),
     new Fallback()
 };
 
