@@ -6,7 +6,7 @@ public sealed class ReviewUncommitted : IFeature
 {
     public bool Accepts(string[] args) => args is ["--uncommitted"];
 
-    public Task<int> RunAsync(string[] args)
+    public async Task<int> RunAsync(string[] args)
     {
         var repositoryRoot = Repository.Discover(Environment.CurrentDirectory);
         var repo = new Repository(repositoryRoot);
@@ -14,6 +14,9 @@ public sealed class ReviewUncommitted : IFeature
         var diff = repo.Diff.Compare<Patch>(null, includeUntracked: true);
         _ = diff;
 
-        return Task.FromResult(ExitCodes.Success);
+        var host = new ConsoleHost();
+        await host.ReviewAsync(diff.Content);
+
+        return ExitCodes.Success;
     }
 }
