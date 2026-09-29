@@ -20,8 +20,13 @@ public sealed class ReviewAutomatic : IFeature
         var defaultBranch = repo.Branches["master"] ?? repo.Branches["main"];
         if (defaultBranch is not null)
         {
+            var currentBranch = repo.Head;
+            var targetBranch = currentBranch.FriendlyName == defaultBranch.FriendlyName
+                ? "origin/" + currentBranch.FriendlyName
+                : defaultBranch.FriendlyName;
+
             var diff = new ReviewDiff();
-            return diff.RunAsync(["--diff", defaultBranch.FriendlyName]);
+            return diff.RunAsync(["--diff", targetBranch]);
         }
 
         return Task.FromResult(ExitCodes.Success);

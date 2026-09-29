@@ -8,6 +8,8 @@ does.
 Simply invoke the tool to have it automatically select the most fitting review mode.
 If there are any uncommitted changes, these will be reviewed - otherwise, a diff
 between the current branch and the default branch (`master`/`main`) will be reviewed.
+If the current branch is alread the default branch, the local `HEAD` is compared against
+the remote `HEAD`.
 
 ```sh
 review-me
