@@ -6,14 +6,14 @@ namespace ReviewMe.Config;
 /// Configuration for <em>ReviewMe</em>.
 /// </summary>
 /// <param name="Configuration">The underlying <see cref="IConfiguration"/>.</param>
-public class Configuration(IConfiguration Configuration)
+public sealed class Configuration(IConfiguration Configuration)
 {
     internal static string Location => FindConfigurationPath();
 
     /// <summary>
     /// The connection string to the model provider.
     /// </summary>
-    public ModelConnectionString? ConnectionString { get; } = Configuration.GetValue<ModelConnectionString>(nameof(ConnectionString));
+    public ModelConnectionString? ConnectionString { get; set; } = Configuration.GetValue<ModelConnectionString>(nameof(ConnectionString));
 
     private static string FindConfigurationPath()
     {

@@ -46,5 +46,5 @@ review-me config provider
 
 Set a new value for `provider`.
 ```sh
-review-me config provider openai;http://127.0.0.1;;
+review-me config ConnectionString Endpoint=http://127.0.0.1:8080/v1;Provider=OpenAI;Model=Qwen3.6
 ```

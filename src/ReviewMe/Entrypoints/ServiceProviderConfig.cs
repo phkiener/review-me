@@ -20,6 +20,8 @@ public static class ServiceProviderConfig
         services.AddSingleton<IEntrypoint, ReviewDiff>();
         services.AddSingleton<IEntrypoint, ReviewFile>();
         services.AddSingleton<IEntrypoint, ReviewAutomatic>();
+        services.AddSingleton<IEntrypoint, ConfigurationGetValue>();
+        services.AddSingleton<IEntrypoint, ConfigurationListKeys>();
 
         // This one *has* to be registered last.
         // It'll match on any arguments, we don't want to skip a possible match.
