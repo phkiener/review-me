@@ -7,6 +7,7 @@ var features = new List<IFeature>
     new PrintVersion(),
     new ReviewUncommitted(),
     new ReviewDiff(),
+    new ReviewFile(),
     new Fallback()
 };
 
