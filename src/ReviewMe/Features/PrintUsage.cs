@@ -2,10 +2,7 @@ namespace ReviewMe.Features;
 
 public sealed class PrintUsage : IFeature
 {
-    public bool Accepts(string[] args)
-    {
-        return args is ["-h"] or ["--help"];
-    }
+    public bool Accepts(string[] args) => args is ["-h"] or ["--help"];
 
     public Task<int> RunAsync(string[] args)
     {

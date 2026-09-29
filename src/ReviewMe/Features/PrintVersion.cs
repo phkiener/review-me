@@ -2,10 +2,7 @@ namespace ReviewMe.Features;
 
 public sealed class PrintVersion : IFeature
 {
-    public bool Accepts(string[] args)
-    {
-        return args is ["-v"] or ["--version"];
-    }
+    public bool Accepts(string[] args) => args is ["-v"] or ["--version"];
 
     public Task<int> RunAsync(string[] args)
     {

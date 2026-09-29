@@ -5,10 +5,7 @@ namespace ReviewMe.Features;
 
 public sealed class ReviewUncommitted : IFeature
 {
-    public bool Accepts(string[] args)
-    {
-        return args is ["--uncommitted"];
-    }
+    public bool Accepts(string[] args) => args is ["--uncommitted"];
 
     public Task<int> RunAsync(string[] args)
     {
