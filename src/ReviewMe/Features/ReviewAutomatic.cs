@@ -2,10 +2,15 @@ using LibGit2Sharp;
 
 namespace ReviewMe.Features;
 
+/// <summary>
+/// Reviews the code with an automagically chosen target.
+/// </summary>
 public sealed class ReviewAutomatic : IFeature
 {
+    /// <inheritdoc/>
     public bool Accepts(string[] args) => args is [];
 
+    /// <inheritdoc/>
     public Task<int> RunAsync(string[] args)
     {
         var repositoryRoot = Repository.Discover(Environment.CurrentDirectory);

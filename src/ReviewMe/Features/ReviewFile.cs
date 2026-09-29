@@ -1,9 +1,14 @@
 namespace ReviewMe.Features;
 
+/// <summary>
+/// Reviews a specific file.
+/// </summary>
 public sealed class ReviewFile : IFeature
 {
+    /// <inheritdoc/>
     public bool Accepts(string[] args) => args is ["--file", _];
 
+    /// <inheritdoc/>
     public async Task<int> RunAsync(string[] args)
     {
         var filePath = args[1];

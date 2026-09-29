@@ -1,9 +1,14 @@
 namespace ReviewMe.Features;
 
+/// <summary>
+/// Print usage information, i.e. all available features.
+/// </summary>
 public sealed class PrintUsage : IFeature
 {
+    /// <inheritdoc/>
     public bool Accepts(string[] args) => args is ["-h"] or ["--help"];
 
+    /// <inheritdoc/>
     public Task<int> RunAsync(string[] args)
     {
         Console.WriteLine("Usage");

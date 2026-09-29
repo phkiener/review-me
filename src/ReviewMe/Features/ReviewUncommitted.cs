@@ -2,10 +2,15 @@ using LibGit2Sharp;
 
 namespace ReviewMe.Features;
 
+/// <summary>
+/// Reviews all uncommitted changes.
+/// </summary>
 public sealed class ReviewUncommitted : IFeature
 {
+    /// <inheritdoc/>
     public bool Accepts(string[] args) => args is ["--uncommitted"];
 
+    /// <inheritdoc/>
     public async Task<int> RunAsync(string[] args)
     {
         var repositoryRoot = Repository.Discover(Environment.CurrentDirectory);

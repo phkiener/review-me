@@ -12,11 +12,17 @@ using ChatResponseFormat = Microsoft.Extensions.AI.ChatResponseFormat;
 
 namespace ReviewMe.ReviewProviders;
 
+/// <summary>
+/// An <see cref="IReviewProvider"/> based on an OpenAI compatible endpoint.
+/// </summary>
 public sealed class SimpleOpenAiReviewProvider : IReviewProvider, IDisposable
 {
     private static readonly JsonSerializerOptions serializerOptions = new(JsonSerializerDefaults.Web) { Converters = { new JsonStringEnumConverter<Category>() }};
     private readonly IChatClient chatClient;
 
+    /// <summary>
+    /// Create a new instance of the <see cref="SimpleOpenAiReviewProvider"/>.
+    /// </summary>
     public SimpleOpenAiReviewProvider()
     {
         // TODO: Establish "connection string"-y thing
@@ -32,8 +38,10 @@ public sealed class SimpleOpenAiReviewProvider : IReviewProvider, IDisposable
         chatClient = openAiClient.AsIChatClient();
     }
 
+    /// <inheritdoc />
     public event EventHandler<ProgressUpdatedEventArgs>? ProgressUpdated;
 
+    /// <inheritdoc />
     public async IAsyncEnumerable<ReviewSuggestion> GenerateReviewAsync(string content, [EnumeratorCancellation] CancellationToken cancellationToken)
     {
         ProgressUpdated?.Invoke(this, new ProgressUpdatedEventArgs("Preparing review..."));
