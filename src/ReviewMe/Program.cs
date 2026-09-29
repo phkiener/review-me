@@ -13,4 +13,14 @@ var features = new List<IFeature>
 };
 
 var matchingFeature = features.First(f => f.Accepts(args));
-return await matchingFeature.RunAsync(args);
+
+try
+{
+    return await matchingFeature.RunAsync(args);
+}
+catch (Exception e)
+{
+    Console.WriteLine(e.Message);
+
+    return ExitCodes.Error;
+}
