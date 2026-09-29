@@ -8,4 +8,5 @@
     <File Path="NuGet.config" />
     <File Path="README.md" />
   </Folder>
+  <Project Path="src/ReviewMe/ReviewMe.csproj" />
 </Solution>
