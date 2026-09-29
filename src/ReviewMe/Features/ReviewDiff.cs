@@ -1,5 +1,4 @@
 using LibGit2Sharp;
-using ReviewMe.Utils;
 
 namespace ReviewMe.Features;
 
@@ -9,7 +8,7 @@ public sealed class ReviewDiff : IFeature
 
     public Task<int> RunAsync(string[] args)
     {
-        var repositoryRoot = GitDiscovery.DiscoverRepositoryRoot(Environment.CurrentDirectory);
+        var repositoryRoot = Repository.Discover(Environment.CurrentDirectory);
         var repo = new Repository(repositoryRoot);
 
         var oldTree = GetCompareTarget(repo, args[1]);
