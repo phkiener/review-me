@@ -21,6 +21,7 @@ public static class ServiceProviderConfig
             .Build();
 
         services.AddSingleton<IConfiguration>(configuration);
+        services.AddSingleton<Configuration>();
 
         return services;
     }

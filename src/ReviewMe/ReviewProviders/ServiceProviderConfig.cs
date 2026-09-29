@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using ReviewMe.Config;
 
 namespace ReviewMe.ReviewProviders;
 
@@ -21,6 +22,12 @@ public static class ServiceProviderConfig
 
     private static IReviewProvider CreateReviewProvider(IServiceProvider serviceProvider)
     {
-        return new SimpleOpenAiReviewProvider();
+        var configuration = serviceProvider.GetRequiredService<Configuration>();
+        return configuration.ConnectionString?.Provider switch
+        {
+            null => throw new InvalidOperationException("No connection string specified."),
+            "OpenAI" => new SimpleOpenAiReviewProvider(configuration.ConnectionString),
+            _ => throw new InvalidOperationException($"Unsupported provider {configuration.ConnectionString.Provider}"),
+        };
     }
 }

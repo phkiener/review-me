@@ -6,6 +6,7 @@ using System.Text.Json.Serialization;
 using Microsoft.Extensions.AI;
 using OpenAI;
 using OpenAI.Chat;
+using ReviewMe.Config;
 using ChatFinishReason = Microsoft.Extensions.AI.ChatFinishReason;
 using ChatMessage = Microsoft.Extensions.AI.ChatMessage;
 using ChatResponseFormat = Microsoft.Extensions.AI.ChatResponseFormat;
@@ -23,15 +24,15 @@ public sealed class SimpleOpenAiReviewProvider : IReviewProvider
     /// <summary>
     /// Create a new instance of the <see cref="SimpleOpenAiReviewProvider"/>.
     /// </summary>
-    public SimpleOpenAiReviewProvider()
+    /// <param name="connectionString">The connection string to use.</param>
+    public SimpleOpenAiReviewProvider(ModelConnectionString connectionString)
     {
-        // TODO: Establish "connection string"-y thing
         var openAiClient = new ChatClient(
-            model: "unsloth/Qwen3.6-35B-A3B-GGUF:Q4_K_M",
-            credential: new ApiKeyCredential("not-needed"),
+            model: connectionString.Model,
+            credential: new ApiKeyCredential(connectionString.ApiKey ?? "not-used"),
             options: new OpenAIClientOptions
             {
-                Endpoint = new Uri("http://127.0.0.1:8080/v1/"),
+                Endpoint = connectionString.Endpoint,
                 RetryPolicy = new ClientRetryPolicy(maxRetries: 0)
             });
 
