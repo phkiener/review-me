@@ -70,7 +70,7 @@ public sealed class SimpleOpenAiReviewProvider : IReviewProvider, IDisposable
                 Focus on things a human reviewer tends to forget; standards adherence, undefined behaviour, edge cases.
                 Keep your answers short and to the point. Do not be overly polite, do not add extra fluff in your messages.
                 Expect the user to be knowledgable, they are not a beginner.
-                When reviewing code, always attach your comments to a specific line of code. Try your hardest to find at least one suggestion.
+                When reviewing code, always attach your comments to a specific line of code.
                 """),
             new(ChatRole.User, $"""
                 Please review this code for me:
