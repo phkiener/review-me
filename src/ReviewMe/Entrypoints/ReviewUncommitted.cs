@@ -5,7 +5,7 @@ namespace ReviewMe.Features;
 /// <summary>
 /// Reviews all uncommitted changes.
 /// </summary>
-public sealed class ReviewUncommitted : IFeature
+public sealed class ReviewUncommitted : IEntrypoint
 {
     /// <inheritdoc/>
     public bool Accepts(string[] args) => args is ["--uncommitted"];

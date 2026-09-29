@@ -3,7 +3,7 @@ namespace ReviewMe.Features;
 /// <summary>
 /// A fallback feature meant to handle the "no other feature matches"-case.
 /// </summary>
-public sealed class Fallback : IFeature
+public sealed class Fallback : IEntrypoint
 {
     /// <inheritdoc/>
     public bool Accepts(string[] args) => true;

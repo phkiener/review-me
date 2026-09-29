@@ -3,7 +3,7 @@ namespace ReviewMe.Features;
 /// <summary>
 /// Print usage information, i.e. all available features.
 /// </summary>
-public sealed class PrintUsage : IFeature
+public sealed class PrintUsage : IEntrypoint
 {
     /// <inheritdoc/>
     public bool Accepts(string[] args) => args is ["-h"] or ["--help"];

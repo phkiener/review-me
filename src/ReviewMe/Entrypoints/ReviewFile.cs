@@ -3,7 +3,7 @@ namespace ReviewMe.Features;
 /// <summary>
 /// Reviews a specific file.
 /// </summary>
-public sealed class ReviewFile : IFeature
+public sealed class ReviewFile : IEntrypoint
 {
     /// <inheritdoc/>
     public bool Accepts(string[] args) => args is ["--file", _];

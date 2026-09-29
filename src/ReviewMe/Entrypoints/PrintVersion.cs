@@ -3,7 +3,7 @@ namespace ReviewMe.Features;
 /// <summary>
 /// Print version information of the compiled binary.
 /// </summary>
-public sealed class PrintVersion : IFeature
+public sealed class PrintVersion : IEntrypoint
 {
     /// <inheritdoc/>
     public bool Accepts(string[] args) => args is ["-v"] or ["--version"];

@@ -5,7 +5,7 @@ namespace ReviewMe.Features;
 /// <summary>
 /// Reviews the code against a given reference (tag, branch or commit).
 /// </summary>
-public sealed class ReviewDiff : IFeature
+public sealed class ReviewDiff : IEntrypoint
 {
     /// <inheritdoc/>
     public bool Accepts(string[] args) => args is ["--diff", _];

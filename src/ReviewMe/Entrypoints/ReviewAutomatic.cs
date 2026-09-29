@@ -5,7 +5,7 @@ namespace ReviewMe.Features;
 /// <summary>
 /// Reviews the code with an automagically chosen target.
 /// </summary>
-public sealed class ReviewAutomatic : IFeature
+public sealed class ReviewAutomatic : IEntrypoint
 {
     /// <inheritdoc/>
     public bool Accepts(string[] args) => args is [];
