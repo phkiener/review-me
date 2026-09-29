@@ -8,6 +8,7 @@ public sealed class ConsoleHost : IDisposable
 {
     private readonly IReviewProvider reviewProvider = new SimpleOpenAiReviewProvider();
     private Channel<ProgressUpdatedEventArgs>? updates;
+    private bool started = false;
 
     public ConsoleHost()
     {
@@ -16,6 +17,11 @@ public sealed class ConsoleHost : IDisposable
 
     public async Task ReviewAsync(string content)
     {
+        if (Interlocked.CompareExchange(ref started, true, false))
+        {
+            throw new InvalidOperationException("Review was already started.");
+        }
+
         updates = Channel.CreateUnbounded<ProgressUpdatedEventArgs>(new() { SingleReader = true, SingleWriter = true });
         var runningReview = Task.Run(() => RunReviewAsync(content));
 
