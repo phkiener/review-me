@@ -1,4 +1,4 @@
-namespace ReviewMe;
+namespace ReviewMe.Config;
 
 public sealed class Configuration
 {

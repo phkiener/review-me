@@ -5,7 +5,7 @@ namespace ReviewMe.Features;
 /// <summary>
 /// Reviews all uncommitted changes.
 /// </summary>
-public sealed class ReviewUncommitted : IEntrypoint
+public sealed class ReviewUncommitted(ConsoleHost host) : IEntrypoint
 {
     /// <inheritdoc/>
     public bool Accepts(string[] args) => args is ["--uncommitted"];
@@ -17,9 +17,6 @@ public sealed class ReviewUncommitted : IEntrypoint
         var repo = new Repository(repositoryRoot);
 
         var diff = repo.Diff.Compare<Patch>(null, includeUntracked: true);
-        _ = diff;
-
-        var host = new ConsoleHost();
         await host.ReviewAsync(diff.Content);
 
         return ExitCodes.Success;

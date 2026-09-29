@@ -83,7 +83,9 @@ public sealed class SimpleOpenAiReviewProvider : IReviewProvider
         var chatOptions = new ChatOptions
         {
             Reasoning = new ReasoningOptions { Effort = ReasoningEffort.None },
-            ResponseFormat = ChatResponseFormat.ForJsonSchema<ReviewSuggestion[]>(serializerOptions)
+            ResponseFormat = ChatResponseFormat.ForJsonSchema<ReviewSuggestion[]>(serializerOptions),
+            Temperature = 0.25f,
+            TopP = 0.1f
         };
 
         return (messages, chatOptions);

@@ -3,7 +3,7 @@ namespace ReviewMe.Features;
 /// <summary>
 /// Reviews a specific file.
 /// </summary>
-public sealed class ReviewFile : IEntrypoint
+public sealed class ReviewFile(ConsoleHost host) : IEntrypoint
 {
     /// <inheritdoc/>
     public bool Accepts(string[] args) => args is ["--file", _];
@@ -19,7 +19,7 @@ public sealed class ReviewFile : IEntrypoint
         }
 
         var content = await File.ReadAllTextAsync(args[1]);
-        _ = content;
+        await host.ReviewAsync(content);
 
         return ExitCodes.Success;
     }

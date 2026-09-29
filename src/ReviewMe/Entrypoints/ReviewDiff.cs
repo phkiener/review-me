@@ -5,13 +5,13 @@ namespace ReviewMe.Features;
 /// <summary>
 /// Reviews the code against a given reference (tag, branch or commit).
 /// </summary>
-public sealed class ReviewDiff : IEntrypoint
+public sealed class ReviewDiff(ConsoleHost host) : IEntrypoint
 {
     /// <inheritdoc/>
     public bool Accepts(string[] args) => args is ["--diff", _];
 
     /// <inheritdoc/>
-    public Task<int> RunAsync(string[] args)
+    public async Task<int> RunAsync(string[] args)
     {
         var repositoryRoot = Repository.Discover(Environment.CurrentDirectory);
         var repo = new Repository(repositoryRoot);
@@ -21,13 +21,13 @@ public sealed class ReviewDiff : IEntrypoint
 
         if (oldTree is null)
         {
-            return Task.FromResult(ExitCodes.Error);
+            return ExitCodes.Error;
         }
 
         var diff = repo.Diff.Compare<Patch>(oldTree, newTree);
-        _ = diff;
+        await host.ReviewAsync(diff);
 
-        return Task.FromResult(ExitCodes.Success);
+        return ExitCodes.Success;
     }
 
     private static Tree? GetCompareTarget(Repository repository, string reference)

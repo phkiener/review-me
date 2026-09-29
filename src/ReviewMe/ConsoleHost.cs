@@ -1,66 +1,49 @@
 using System.Text.Json;
 using System.Threading.Channels;
-using ReviewMe.ReviewProviders;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace ReviewMe;
 
-public sealed class ConsoleHost : IDisposable
+public sealed class ConsoleHost(IServiceProvider serviceProvider, ILogger<ConsoleHost> logger)
 {
-    private readonly IReviewProvider reviewProvider = new SimpleOpenAiReviewProvider();
-    private Channel<ProgressUpdatedEventArgs>? updates;
-    private bool started = false;
-
-    public ConsoleHost()
-    {
-        reviewProvider.ProgressUpdated += OnProgressUpdated;
-    }
-
     public async Task ReviewAsync(string content)
     {
-        if (Interlocked.CompareExchange(ref started, true, false))
-        {
-            throw new InvalidOperationException("Review was already started.");
-        }
+        var progressUpdateChannel = Channel.CreateUnbounded<ProgressUpdatedEventArgs>(new() { SingleReader = true, SingleWriter = true });
+        using var reviewProvider = serviceProvider.GetRequiredService<IReviewProvider>();
 
-        updates = Channel.CreateUnbounded<ProgressUpdatedEventArgs>(new() { SingleReader = true, SingleWriter = true });
-        var runningReview = Task.Run(() => RunReviewAsync(content));
+        var suggestions = await ReviewCoreAsync(reviewProvider, progressUpdateChannel, content);
 
-        var progressUpdates = updates.Reader.ReadAllAsync();
-        await foreach (var update in progressUpdates)
-        {
-            Console.WriteLine(update.Message);
-        }
-
-        var suggestions = await runningReview;
+        // TODO: Proper output formatting
         Console.WriteLine(JsonSerializer.Serialize(suggestions, new JsonSerializerOptions { WriteIndented = true }));
     }
 
-    private async Task<IEnumerable<ReviewSuggestion>> RunReviewAsync(string content)
+    private async Task<IEnumerable<ReviewSuggestion>> ReviewCoreAsync(IReviewProvider reviewProvider, Channel<ProgressUpdatedEventArgs> progress, string content)
+    {
+        var reviewTask = Task.Run(() => RunReviewAsync(reviewProvider, content, progress.Writer));
+
+        var progressUpdates = progress.Reader.ReadAllAsync();
+        await foreach (var update in progressUpdates)
+        {
+            logger.LogInformation("{Message}",  update.Message);
+        }
+
+        return await reviewTask;
+    }
+
+    private static async Task<ReviewSuggestion[]> RunReviewAsync(IReviewProvider reviewProvider, string content, ChannelWriter<ProgressUpdatedEventArgs> progressWriter)
     {
         try
         {
+            reviewProvider.ProgressUpdated += (_, update) => progressWriter.TryWrite(update);
+
+            // TODO: Split review per file?
             var result = reviewProvider.GenerateReviewAsync(content, CancellationToken.None);
-            return await result.ToListAsync();
+            return await result.ToArrayAsync();
         }
         finally
         {
-            updates?.Writer.Complete();
-        }
-    }
-
-    private void OnProgressUpdated(object? sender, ProgressUpdatedEventArgs eventArgs)
-    {
-        updates?.Writer.TryWrite(eventArgs);
-    }
-
-    public void Dispose()
-    {
-        reviewProvider.ProgressUpdated -= OnProgressUpdated;
-
-        // TODO: Probably DI-wire this up
-        if (reviewProvider is IDisposable disposable)
-        {
-            disposable.Dispose();
+            progressWriter.Complete();
         }
     }
 }

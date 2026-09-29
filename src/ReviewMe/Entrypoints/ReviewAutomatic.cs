@@ -5,7 +5,7 @@ namespace ReviewMe.Features;
 /// <summary>
 /// Reviews the code with an automagically chosen target.
 /// </summary>
-public sealed class ReviewAutomatic : IEntrypoint
+public sealed class ReviewAutomatic(ConsoleHost host) : IEntrypoint
 {
     /// <inheritdoc/>
     public bool Accepts(string[] args) => args is [];
@@ -18,7 +18,7 @@ public sealed class ReviewAutomatic : IEntrypoint
 
         if (repo.RetrieveStatus().IsDirty)
         {
-            var uncommitted = new ReviewUncommitted();
+            var uncommitted = new ReviewUncommitted(host);
             return uncommitted.RunAsync(["--uncommitted"]);
         }
 
@@ -30,7 +30,7 @@ public sealed class ReviewAutomatic : IEntrypoint
                 ? "origin/" + currentBranch.FriendlyName
                 : defaultBranch.FriendlyName;
 
-            var diff = new ReviewDiff();
+            var diff = new ReviewDiff(host);
             return diff.RunAsync(["--diff", targetBranch]);
         }
 

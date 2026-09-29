@@ -1,26 +1,16 @@
-﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using ReviewMe;
+using ReviewMe.Config;
 using ReviewMe.Features;
 using ReviewMe.ReviewProviders;
 
-var configuration = new ConfigurationBuilder()
-    .AddJsonFile(Configuration.Location, optional: true)
-    .AddEnvironmentVariables(prefix: "REVIEWME_")
-    .Build();
-
 await using var serviceProvider = new ServiceCollection()
-    .AddLogging(static b => b.AddConsole())
-    .AddSingleton<IConfiguration>(configuration)
-    .AddSingleton<IEntrypoint, PrintUsage>()
-    .AddSingleton<IEntrypoint, PrintVersion>()
-    .AddSingleton<IEntrypoint, ReviewUncommitted>()
-    .AddSingleton<IEntrypoint, ReviewDiff>()
-    .AddSingleton<IEntrypoint, ReviewFile>()
-    .AddSingleton<IEntrypoint, ReviewAutomatic>()
-    .AddSingleton<IEntrypoint, Fallback>()
-    .AddTransient(ReviewProviderFactory.Create)
+    .AddLogging(static b => b.AddConsole()) // TODO: When proper output is built, this logger might interfere with the output itself...
+    .AddConfiguration()
+    .AddEntrypoints()
+    .AddReviewProvider()
+    .AddSingleton<ConsoleHost>()
     .BuildServiceProvider();
 
 var features = serviceProvider.GetServices<IEntrypoint>();
