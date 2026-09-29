@@ -15,7 +15,7 @@ namespace ReviewMe.ReviewProviders;
 /// <summary>
 /// An <see cref="IReviewProvider"/> based on an OpenAI compatible endpoint.
 /// </summary>
-public sealed class SimpleOpenAiReviewProvider : IReviewProvider, IDisposable
+public sealed class SimpleOpenAiReviewProvider : IReviewProvider
 {
     private static readonly JsonSerializerOptions serializerOptions = new(JsonSerializerDefaults.Web) { Converters = { new JsonStringEnumConverter<Category>() }};
     private readonly IChatClient chatClient;

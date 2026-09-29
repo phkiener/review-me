@@ -16,7 +16,7 @@ public sealed class ProgressUpdatedEventArgs(string message) : EventArgs
 /// <summary>
 /// A review provider capable of generating a list of <see cref="ReviewSuggestion"/>s for a given content.
 /// </summary>
-public interface IReviewProvider
+public interface IReviewProvider : IDisposable
 {
     /// <summary>
     /// An event emitted to signal status updates for a running review.
