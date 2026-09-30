@@ -42,7 +42,7 @@ public sealed class SimpleOpenAiReviewProvider : IReviewProvider
     /// <inheritdoc />
     public async IAsyncEnumerable<ReviewSuggestion> GenerateReviewAsync(ReviewRequest request, [EnumeratorCancellation] CancellationToken cancellationToken)
     {
-        var (chatHistory, chatOptions) = PrepareReview(request.Content);
+        var (chatHistory, chatOptions) = PrepareReview(request.Content, request.IsDiff);
         var response = await chatClient.GetResponseAsync(chatHistory, chatOptions, cancellationToken);
 
         var suggestions = ReadSuggestions(response);
@@ -54,22 +54,21 @@ public sealed class SimpleOpenAiReviewProvider : IReviewProvider
         }
     }
 
-    private static (List<ChatMessage> Messages, ChatOptions Options) PrepareReview(string content)
+    private static (List<ChatMessage> Messages, ChatOptions Options) PrepareReview(string content, bool isDiff)
     {
         var messages = new List<ChatMessage>
         {
             new(ChatRole.System, """
-                You run an autonomous code review. You are a tool, never write in first person. Do not ever say 'I' or 'my' or 'myself'.
-                The user will send you a code snippet of either a plain file or a git diff. Review this code to the best of your abilities.
-                Focus on things a human reviewer tends to forget; standards adherence, undefined behaviour, edge cases.
-                Keep your answers short and to the point. Do not be overly polite, do not add extra fluff in your messages.
-                Expect the user to be knowledgable, they are not a beginner.
-                When reviewing code, always attach your comments to a specific line of code. You can assume that the code compiles correctly,
-                do not raise issues that the compiler can detect. Do not raise any issues about package or framework versions. Do not raise
-                any issues where up-to-date information would be required.
+                You are an autonomous code reviewer. Phrase your answers neutrally, addressing only the code.
+                The user will send you a code snippet, either a full file or a diff. Review this snippet to the best of your abilities.
+                Focus on things a human reviewer tends to forget: standards adherence, undefined behaviour, edge cases.
+                If the issue can be detected by a standard toolchain (e.g. package version mismatches, missing import statements), skip the issue
+                entirely.
+                Keep the suggestions short and to the point. Do not be overly polite, assume that the user is very proficient and knowledgeable.
+                When reviewing code, always attach your comments to a specific line of code.
                 """),
             new(ChatRole.User, $"""
-                Please review this code for me:
+                Review this {(isDiff ? "diff" : "file")}:
                 ```
                 {content}
                 ```
