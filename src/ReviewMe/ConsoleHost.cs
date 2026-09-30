@@ -1,3 +1,7 @@
+using Markdig;
+using Markdig.Renderers;
+using Markdig.Renderers.Html;
+using Markdig.Syntax.Inlines;
 using Microsoft.Extensions.DependencyInjection;
 using ReviewMe.Review;
 using Spectre.Console;
@@ -35,9 +39,13 @@ public sealed class ConsoleHost(IServiceProvider serviceProvider)
                             }
                         }
                         AnsiConsole.Write(new Rule(suggestion.FilePath) { Style = Style.Parse("Gray")});
-
                         AnsiConsole.WriteLine();
-                        AnsiConsole.WriteLine(suggestion.Content);
+
+                        var writer = new StringWriter();
+                        var renderer = new MarkdownRenderer(writer);
+                        Markdown.Convert(suggestion.Content, renderer);
+
+                        AnsiConsole.MarkupLine(writer.ToString());
                         AnsiConsole.WriteLine();
 
                         var colorForCategory = suggestion.Category switch
@@ -52,5 +60,26 @@ public sealed class ConsoleHost(IServiceProvider serviceProvider)
                     }
                 }
             });
+    }
+
+    private sealed class MarkdownRenderer : HtmlRenderer
+    {
+        public MarkdownRenderer(TextWriter writer) : base(writer)
+        {
+            EnableHtmlEscape = false;
+            EnableHtmlForBlock = false;
+            EnableHtmlForInline = false;
+
+            ObjectRenderers.RemoveAll(s => s is HtmlObjectRenderer<CodeInline>);
+            ObjectRenderers.Add(new SpectreConsoleRenderer());
+        }
+
+        private sealed class SpectreConsoleRenderer : HtmlObjectRenderer<CodeInline>
+        {
+            protected override void Write(HtmlRenderer renderer, CodeInline obj)
+            {
+                renderer.Write($"[Blue]{AnsiMarkup.Escape(obj.Content)}[/]");
+            }
+        }
     }
 }
