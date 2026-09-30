@@ -64,6 +64,7 @@ public sealed class SimpleOpenAiReviewProvider : IReviewProvider
                 Focus on things a human reviewer tends to forget: standards adherence, undefined behaviour, edge cases.
                 If the issue can be detected by a standard toolchain (e.g. package version mismatches, missing import statements), skip the issue
                 entirely.
+                If you need additional information for a specific issue, prefer to skip it entirely or assume the best-case scenario.
                 Keep the suggestions short and to the point. Do not be overly polite, assume that the user is very proficient and knowledgeable.
                 When reviewing code, always attach your comments to a specific line of code.
                 """),
