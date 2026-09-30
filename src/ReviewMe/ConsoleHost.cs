@@ -20,7 +20,8 @@ public sealed class ConsoleHost(IServiceProvider serviceProvider)
                     ctx.Status($"Reviewing {request.FilePath} ({index + 1}/{requests.Count})");
 
                     var fileContent = await File.ReadAllLinesAsync(request.FilePath);
-                    var suggestions = reviewProvider.GenerateReviewAsync(request, CancellationToken.None);
+                    using var cancellation = new CancellationTokenSource(TimeSpan.FromSeconds(90));
+                    var suggestions = reviewProvider.GenerateReviewAsync(request, cancellation.Token);
 
                     await foreach (var suggestion in suggestions)
                     {
