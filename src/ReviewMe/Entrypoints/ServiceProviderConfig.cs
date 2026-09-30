@@ -20,6 +20,7 @@ public static class ServiceProviderConfig
         services.AddSingleton<IEntrypoint, ReviewDiff>();
         services.AddSingleton<IEntrypoint, ReviewFile>();
         services.AddSingleton<IEntrypoint, ReviewAutomatic>();
+        services.AddSingleton<IEntrypoint, ConfigurationSetValue>();
         services.AddSingleton<IEntrypoint, ConfigurationGetValue>();
         services.AddSingleton<IEntrypoint, ConfigurationListKeys>();
 

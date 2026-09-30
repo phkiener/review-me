@@ -20,7 +20,6 @@ public sealed class Configuration(IConfiguration Configuration)
         var configHome = Environment.GetEnvironmentVariable("XDG_CONFIG_HOME")
                          ?? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".config");
 
-
         return Path.Combine(configHome, "review-me", "settings.json");
     }
 }

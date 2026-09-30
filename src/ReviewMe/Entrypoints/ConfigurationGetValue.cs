@@ -22,6 +22,6 @@ public sealed class ConfigurationGetValue(Configuration configuration) : IEntryp
 
         Console.WriteLine(value);
 
-        return Task.FromResult(1);
+        return Task.FromResult(ExitCodes.Success);
     }
 }
