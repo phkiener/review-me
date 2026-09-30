@@ -13,7 +13,7 @@ public sealed class Configuration(IConfiguration Configuration)
     /// <summary>
     /// The connection string to the model provider.
     /// </summary>
-    public ModelConnectionString? ConnectionString { get; set; } = Configuration.GetValue<ModelConnectionString>(nameof(ConnectionString));
+    public ModelConnectionString? ConnectionString { get; } = Configuration.GetValue<ModelConnectionString>(nameof(ConnectionString));
 
     private static string FindConfigurationPath()
     {
