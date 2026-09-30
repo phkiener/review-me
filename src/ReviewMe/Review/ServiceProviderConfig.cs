@@ -1,7 +1,8 @@
 using Microsoft.Extensions.DependencyInjection;
 using ReviewMe.Config;
+using ReviewMe.Review.Providers;
 
-namespace ReviewMe.ReviewProviders;
+namespace ReviewMe.Review;
 
 /// <summary>
 /// DI registration for a <see cref="IReviewProvider"/>s.
@@ -13,7 +14,7 @@ public static class ServiceProviderConfig
     /// </summary>
     /// <param name="services">The <see cref="IServiceCollection"/> to add the services to.</param>
     /// <returns>The given <see cref="IServiceCollection"/>.</returns>
-    public static IServiceCollection AddReviewProvider(this IServiceCollection services)
+    public static IServiceCollection AddReviewProviders(this IServiceCollection services)
     {
         services.AddTransient(CreateReviewProvider);
 

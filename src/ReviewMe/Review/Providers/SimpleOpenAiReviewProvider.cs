@@ -11,14 +11,14 @@ using ChatFinishReason = Microsoft.Extensions.AI.ChatFinishReason;
 using ChatMessage = Microsoft.Extensions.AI.ChatMessage;
 using ChatResponseFormat = Microsoft.Extensions.AI.ChatResponseFormat;
 
-namespace ReviewMe.ReviewProviders;
+namespace ReviewMe.Review.Providers;
 
 /// <summary>
 /// An <see cref="IReviewProvider"/> based on an OpenAI compatible endpoint.
 /// </summary>
 public sealed class SimpleOpenAiReviewProvider : IReviewProvider
 {
-    private static readonly JsonSerializerOptions serializerOptions = new(JsonSerializerDefaults.Web) { Converters = { new JsonStringEnumConverter<Category>() }};
+    private static readonly JsonSerializerOptions serializerOptions = new(JsonSerializerDefaults.Web) { Converters = { new JsonStringEnumConverter<SuggestionCategory>() }};
     private readonly IChatClient chatClient;
 
     /// <summary>
@@ -40,24 +40,17 @@ public sealed class SimpleOpenAiReviewProvider : IReviewProvider
     }
 
     /// <inheritdoc />
-    public event EventHandler<ProgressUpdatedEventArgs>? ProgressUpdated;
-
-    /// <inheritdoc />
-    public async IAsyncEnumerable<ReviewSuggestion> GenerateReviewAsync(string content, [EnumeratorCancellation] CancellationToken cancellationToken)
+    public async IAsyncEnumerable<ReviewSuggestion> GenerateReviewAsync(ReviewRequest request, [EnumeratorCancellation] CancellationToken cancellationToken)
     {
-        ProgressUpdated?.Invoke(this, new ProgressUpdatedEventArgs("Preparing review..."));
-        var (chatHistory, chatOptions) = PrepareReview(content);
-
-        ProgressUpdated?.Invoke(this, new ProgressUpdatedEventArgs("Running review..."));
+        var (chatHistory, chatOptions) = PrepareReview(request.Content);
         var response = await chatClient.GetResponseAsync(chatHistory, chatOptions, cancellationToken);
 
-        ProgressUpdated?.Invoke(this, new ProgressUpdatedEventArgs("Collecting suggestions..."));
         var suggestions = ReadSuggestions(response);
 
         // TODO: Would be awesome to stream this. Later...
         foreach (var suggestion in suggestions)
         {
-            yield return suggestion;
+            yield return suggestion with { FilePath = request.FilePath };
         }
     }
 

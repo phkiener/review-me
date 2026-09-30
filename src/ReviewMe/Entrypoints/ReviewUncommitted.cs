@@ -1,4 +1,5 @@
 using LibGit2Sharp;
+using ReviewMe.Review;
 
 namespace ReviewMe.Features;
 
@@ -17,7 +18,9 @@ public sealed class ReviewUncommitted(ConsoleHost host) : IEntrypoint
         var repo = new Repository(repositoryRoot);
 
         var diff = repo.Diff.Compare<Patch>(null, includeUntracked: true);
-        await host.ReviewAsync(diff.Content);
+        var requests = diff.Select(e => new ReviewRequest(e.Path, e.Patch, IsDiff: true)).ToList();
+
+        await host.ReviewAsync(requests);
 
         return ExitCodes.Success;
     }

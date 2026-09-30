@@ -1,4 +1,5 @@
 using LibGit2Sharp;
+using ReviewMe.Review;
 
 namespace ReviewMe.Features;
 
@@ -25,7 +26,9 @@ public sealed class ReviewDiff(ConsoleHost host) : IEntrypoint
         }
 
         var diff = repo.Diff.Compare<Patch>(oldTree, newTree);
-        await host.ReviewAsync(diff);
+        var requests = diff.Select(e => new ReviewRequest(e.Path, e.Patch, IsDiff: true)).ToList();
+
+        await host.ReviewAsync(requests);
 
         return ExitCodes.Success;
     }

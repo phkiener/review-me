@@ -3,13 +3,14 @@ using Microsoft.Extensions.Logging;
 using ReviewMe;
 using ReviewMe.Config;
 using ReviewMe.Features;
-using ReviewMe.ReviewProviders;
+using ReviewMe.Review;
+using ReviewMe.Review.Providers;
 
 await using var serviceProvider = new ServiceCollection()
     .AddLogging(static b => b.AddConsole()) // TODO: When proper output is built, this logger might interfere with the output itself...
     .AddConfiguration()
     .AddEntrypoints()
-    .AddReviewProvider()
+    .AddReviewProviders()
     .AddSingleton<ConsoleHost>()
     .BuildServiceProvider();
 

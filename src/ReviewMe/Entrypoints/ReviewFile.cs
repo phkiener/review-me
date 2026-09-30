@@ -1,3 +1,5 @@
+using ReviewMe.Review;
+
 namespace ReviewMe.Features;
 
 /// <summary>
@@ -19,7 +21,9 @@ public sealed class ReviewFile(ConsoleHost host) : IEntrypoint
         }
 
         var content = await File.ReadAllTextAsync(args[1]);
-        await host.ReviewAsync(content);
+        var request = new ReviewRequest(args[1], content, IsDiff: false);
+
+        await host.ReviewAsync([request]);
 
         return ExitCodes.Success;
     }
