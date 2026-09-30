@@ -20,21 +20,12 @@ public sealed class ConsoleHost(IServiceProvider serviceProvider)
                     ctx.Status($"Reviewing {request.FilePath} ({index + 1}/{requests.Count})");
 
                     var fileContent = await File.ReadAllLinesAsync(request.FilePath);
-
                     var suggestions = reviewProvider.GenerateReviewAsync(request, CancellationToken.None);
 
-                    var isFirst = true;
                     await foreach (var suggestion in suggestions)
                     {
-                        if (!isFirst)
-                        {
-                            AnsiConsole.Write(new Rule());
-                        }
-
-                        isFirst = false;
-
-                        AnsiConsole.MarkupLineInterpolated($"[Gray]File:[/] {suggestion.FilePath}");
-                        for (var offset = -1; offset <= 1; offset++)
+                        AnsiConsole.Write(new Rule(suggestion.FilePath) { Style = Style.Parse("Gray")});
+                        for (var offset = -2; offset <= 2; offset++)
                         {
                             var line = fileContent.ElementAtOrDefault(suggestion.LineNumber + offset - 1);
                             if (line is not null)
@@ -42,6 +33,7 @@ public sealed class ConsoleHost(IServiceProvider serviceProvider)
                                 AnsiConsole.MarkupLineInterpolated($"[Gray]{suggestion.LineNumber + offset:0000}|[/] [Blue]{line}[/]");
                             }
                         }
+                        AnsiConsole.Write(new Rule(suggestion.FilePath) { Style = Style.Parse("Gray")});
 
                         AnsiConsole.WriteLine();
                         AnsiConsole.WriteLine(suggestion.Content);
