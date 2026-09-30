@@ -1,27 +1,63 @@
-using System.Text.Json;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using ReviewMe.Review;
+using Spectre.Console;
 
 namespace ReviewMe;
 
-public sealed class ConsoleHost(IServiceProvider serviceProvider, ILogger<ConsoleHost> logger)
+public sealed class ConsoleHost(IServiceProvider serviceProvider)
 {
     public async Task ReviewAsync(IReadOnlyList<ReviewRequest> requests)
     {
         using var reviewProvider = serviceProvider.GetRequiredService<IReviewProvider>();
 
-        for (var index = 0; index < requests.Count; index++)
-        {
-            var request = requests[index];
+        await AnsiConsole.Status()
+            .Spinner(Spinner.Known.BouncingBar)
+            .StartAsync("Running review", async ctx =>
+            {
+                for (var index = 0; index < requests.Count; index++)
+                {
+                    var request = requests[index];
+                    ctx.Status($"Reviewing {request.FilePath} ({index + 1}/{requests.Count})");
 
-            logger.LogInformation("Reviewing {File} ({Current}/{Total})", request.FilePath, index + 1, requests.Count);
+                    var fileContent = await File.ReadAllLinesAsync(request.FilePath);
 
-            var result = await reviewProvider.GenerateReviewAsync(request, CancellationToken.None)
-                .ToListAsync(cancellationToken: CancellationToken.None);
+                    var suggestions = reviewProvider.GenerateReviewAsync(request, CancellationToken.None);
 
-            // TODO: Proper output formatting
-            Console.WriteLine(JsonSerializer.Serialize(result, new JsonSerializerOptions { WriteIndented = true }));
-        }
+                    var isFirst = true;
+                    await foreach (var suggestion in suggestions)
+                    {
+                        if (!isFirst)
+                        {
+                            AnsiConsole.Write(new Rule());
+                        }
+
+                        isFirst = false;
+
+                        AnsiConsole.MarkupLineInterpolated($"[Gray]File:[/] {suggestion.FilePath}");
+                        for (var offset = -1; offset <= 1; offset++)
+                        {
+                            var line = fileContent.ElementAtOrDefault(suggestion.LineNumber + offset - 1);
+                            if (line is not null)
+                            {
+                                AnsiConsole.MarkupLineInterpolated($"[Gray]{suggestion.LineNumber + offset:0000}|[/] [Blue]{line}[/]");
+                            }
+                        }
+
+                        AnsiConsole.WriteLine();
+                        AnsiConsole.WriteLine(suggestion.Content);
+                        AnsiConsole.WriteLine();
+
+                        var colorForCategory = suggestion.Category switch
+                        {
+                            SuggestionCategory.Nitpick => "Cyan",
+                            SuggestionCategory.Suggestion => "Green",
+                            SuggestionCategory.Issue => "Orange1",
+                            _ => "White"
+                        };
+
+                        AnsiConsole.MarkupLineInterpolated($"Severity: [{colorForCategory}]{suggestion.Category}[/]");
+                    }
+                }
+            });
     }
 }
