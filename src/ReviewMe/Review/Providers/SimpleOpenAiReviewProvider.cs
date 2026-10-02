@@ -30,8 +30,8 @@ public sealed class SimpleOpenAiReviewProvider : IReviewProvider
     private static readonly JsonSerializerOptions serializerOptions = new(JsonSerializerDefaults.Web) { Converters = { new JsonStringEnumConverter<SuggestionCategory>() }};
     private static readonly ChatOptions chatOptions = new()
     {
-        Reasoning = new ReasoningOptions { Effort = ReasoningEffort.None },
-        ResponseFormat = ChatResponseFormat.ForJsonSchema<ReviewSuggestion[]>(serializerOptions),
+        Reasoning = new ReasoningOptions { Effort = ReasoningEffort.Low },
+        ResponseFormat = ChatResponseFormat.ForJsonSchema<GeneratedComment[]>(serializerOptions, schemaDescription: "Schema for a review comment for a specific line of code."),
         Temperature = 0.25f,
         TopP = 0.1f
     };
@@ -62,7 +62,9 @@ public sealed class SimpleOpenAiReviewProvider : IReviewProvider
         var messages = new List<ChatMessage>
         {
             new(ChatRole.System, MainSystemPrompt),
-            new(ChatRole.User, $"Review the file `{fileContent.FilePath}`:\n{fileContent.Content}")
+            new(ChatRole.System, "Review the full content of the file."),
+            new(ChatRole.User, $"Review the file for `{fileContent.FilePath}` for me."),
+            new(ChatRole.User, $"The full content is:\n```\n{fileContent.Content}\n```"),
         };
 
         var response = await chatClient.GetResponseAsync(messages, chatOptions, cancellationToken);
@@ -80,8 +82,10 @@ public sealed class SimpleOpenAiReviewProvider : IReviewProvider
         var messages = new List<ChatMessage>
         {
             new(ChatRole.System, MainSystemPrompt),
-            new(ChatRole.System, $"The user will send you a diff to review. Review only the changes in the diff. The full file content is:\n{diff.UpdatedContent}"),
-            new(ChatRole.User, $"Review the changes to the file `{diff.FilePath}`:\n{diff.Diff}")
+            new(ChatRole.System, "Mention issues only for lines changed in the diff. The full content is provided only for context, skip all issues found in lines that are not modified."),
+            new(ChatRole.User, $"Review the diff for `{diff.FilePath}` for me."),
+            new(ChatRole.User, $"The full content is:\n```\n{diff.UpdatedContent}\n```"),
+            new(ChatRole.User, $"The changes are in the following diff:\n```\n{diff.Diff}\n```"),
         };
 
         var response = await chatClient.GetResponseAsync(messages, chatOptions, cancellationToken);

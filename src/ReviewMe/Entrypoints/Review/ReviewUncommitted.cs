@@ -20,6 +20,12 @@ public sealed class ReviewUncommitted(IReviewProvider reviewProvider, IOutputWri
         var fullDiff = repo.Diff.Compare<Patch>(null, includeUntracked: true);
         foreach (var diff in fullDiff)
         {
+            if (diff.Status is ChangeKind.Deleted or ChangeKind.Renamed)
+            {
+                Console.WriteLine($"Skipping {diff.Path} (deleted and renamed files are not reviewed)...");
+                continue;
+            }
+
             Console.WriteLine($"Reviewing {diff.Path}...");
             var content = await File.ReadAllTextAsync(diff.Path);
 
