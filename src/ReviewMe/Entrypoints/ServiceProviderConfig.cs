@@ -1,4 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
+using ReviewMe.Entrypoints.Configuration;
+using ReviewMe.Entrypoints.Review;
 
 namespace ReviewMe.Features;
 

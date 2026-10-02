@@ -1,6 +1,6 @@
 using ReviewMe.Review;
 
-namespace ReviewMe.Features;
+namespace ReviewMe.Entrypoints.Review;
 
 /// <summary>
 /// Reviews a specific file.

@@ -1,6 +1,4 @@
-using ReviewMe.Config;
-
-namespace ReviewMe.Features;
+namespace ReviewMe.Entrypoints.Configuration;
 
 /// <summary>
 /// List all supported configuration keys.
@@ -13,7 +11,7 @@ public sealed class ConfigurationListKeys : IEntrypoint
     /// <inheritdoc />
     public Task<int> RunAsync(string[] args)
     {
-        Console.WriteLine(nameof(Configuration.ConnectionString));
+        Console.WriteLine(nameof(Config.Configuration.ConnectionString));
 
         return Task.FromResult(ExitCodes.Success);
     }

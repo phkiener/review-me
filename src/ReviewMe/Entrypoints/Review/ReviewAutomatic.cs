@@ -1,6 +1,6 @@
 using LibGit2Sharp;
 
-namespace ReviewMe.Features;
+namespace ReviewMe.Entrypoints.Review;
 
 /// <summary>
 /// Reviews the code with an automagically chosen target.

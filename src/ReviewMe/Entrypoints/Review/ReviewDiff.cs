@@ -1,7 +1,7 @@
 using LibGit2Sharp;
 using ReviewMe.Review;
 
-namespace ReviewMe.Features;
+namespace ReviewMe.Entrypoints.Review;
 
 /// <summary>
 /// Reviews the code against a given reference (tag, branch or commit).
