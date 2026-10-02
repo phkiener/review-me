@@ -27,7 +27,7 @@
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     
     <RepositoryType>git</RepositoryType>
-    <RepositoryUrl>https://github.com/phkiener/Swallow.Refactor</RepositoryUrl>
+    <RepositoryUrl>https://github.com/phkiener/review-me</RepositoryUrl>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
   </PropertyGroup>
 
