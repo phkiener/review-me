@@ -35,6 +35,9 @@ public sealed class ReviewUncommitted(IReviewProvider reviewProvider, IOutputWri
             await outputWriter.WriteOutputAsync(suggestions, CancellationToken.None);
         }
 
+        Console.WriteLine("Review completed. Note: You shouldn't blindly trust LLM-generated text.");
+        Console.WriteLine("Take the generated comments with a grain of salt. They might be correct, they might be technically correct - or they might be absolutely wrong.");
+
         return ExitCodes.Success;
     }
 }
