@@ -2,12 +2,14 @@
 using ReviewMe;
 using ReviewMe.Config;
 using ReviewMe.Features;
+using ReviewMe.Output;
 using ReviewMe.Review;
 
 await using var serviceProvider = new ServiceCollection()
     .AddConfiguration()
     .AddEntrypoints()
     .AddReviewProviders()
+    .AddOutputWriters()
     .AddSingleton<ConsoleHost>()
     .BuildServiceProvider();
 
