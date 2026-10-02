@@ -6,7 +6,7 @@ namespace ReviewMe.Entrypoints.Review;
 /// <summary>
 /// Reviews the code against a given reference (tag, branch or commit).
 /// </summary>
-public sealed class ReviewDiff(ConsoleHost host) : IEntrypoint
+public sealed class ReviewDiff(IReviewProvider reviewProvider, IOutputWriter outputWriter) : IEntrypoint
 {
     /// <inheritdoc/>
     public bool Accepts(string[] args) => args is ["--diff", _];
@@ -25,10 +25,17 @@ public sealed class ReviewDiff(ConsoleHost host) : IEntrypoint
             return ExitCodes.Error;
         }
 
-        var diff = repo.Diff.Compare<Patch>(oldTree, newTree);
-        var requests = diff.Select(e => new ReviewRequest(e.Path, e.Patch, IsDiff: true)).ToList();
+        var fullDiff = repo.Diff.Compare<Patch>(oldTree, newTree);
+        foreach (var diff in fullDiff)
+        {
+            Console.WriteLine($"Reviewing {diff.Path}...");
+            var content = await File.ReadAllTextAsync(diff.Path);
 
-        await host.ReviewAsync(requests);
+            var change = new FileDiff(diff.Path, content, diff.Patch);
+            var suggestions = reviewProvider.GenerateReviewAsync(change, CancellationToken.None);
+
+            await outputWriter.WriteOutputAsync(suggestions, CancellationToken.None);
+        }
 
         return ExitCodes.Success;
     }

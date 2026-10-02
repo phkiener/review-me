@@ -6,7 +6,7 @@ namespace ReviewMe.Entrypoints.Review;
 /// <summary>
 /// Reviews all uncommitted changes.
 /// </summary>
-public sealed class ReviewUncommitted(ConsoleHost host) : IEntrypoint
+public sealed class ReviewUncommitted(IReviewProvider reviewProvider, IOutputWriter outputWriter) : IEntrypoint
 {
     /// <inheritdoc/>
     public bool Accepts(string[] args) => args is ["--uncommitted"];
@@ -17,10 +17,17 @@ public sealed class ReviewUncommitted(ConsoleHost host) : IEntrypoint
         var repositoryRoot = Repository.Discover(Environment.CurrentDirectory);
         var repo = new Repository(repositoryRoot);
 
-        var diff = repo.Diff.Compare<Patch>(null, includeUntracked: true);
-        var requests = diff.Select(e => new ReviewRequest(e.Path, e.Patch, IsDiff: true)).ToList();
+        var fullDiff = repo.Diff.Compare<Patch>(null, includeUntracked: true);
+        foreach (var diff in fullDiff)
+        {
+            Console.WriteLine($"Reviewing {diff.Path}...");
+            var content = await File.ReadAllTextAsync(diff.Path);
 
-        await host.ReviewAsync(requests);
+            var change = new FileDiff(diff.Path, content, diff.Patch);
+            var suggestions = reviewProvider.GenerateReviewAsync(change, CancellationToken.None);
+
+            await outputWriter.WriteOutputAsync(suggestions, CancellationToken.None);
+        }
 
         return ExitCodes.Success;
     }

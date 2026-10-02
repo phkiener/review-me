@@ -5,7 +5,7 @@ namespace ReviewMe.Entrypoints.Review;
 /// <summary>
 /// Reviews a specific file.
 /// </summary>
-public sealed class ReviewFile(ConsoleHost host) : IEntrypoint
+public sealed class ReviewFile(IReviewProvider reviewProvider, IOutputWriter outputWriter) : IEntrypoint
 {
     /// <inheritdoc/>
     public bool Accepts(string[] args) => args is ["--file", _];
@@ -21,9 +21,11 @@ public sealed class ReviewFile(ConsoleHost host) : IEntrypoint
         }
 
         var content = await File.ReadAllTextAsync(args[1]);
-        var request = new ReviewRequest(args[1], content, IsDiff: false);
+        var fileContent = new FileContent(args[1], content);
 
-        await host.ReviewAsync([request]);
+        Console.WriteLine($"Reviewing {args[1]}...");
+        var suggestions = reviewProvider.GenerateReviewAsync(fileContent, CancellationToken.None);
+        await outputWriter.WriteOutputAsync(suggestions, CancellationToken.None);
 
         return ExitCodes.Success;
     }

@@ -1,11 +1,12 @@
 using LibGit2Sharp;
+using ReviewMe.Review;
 
 namespace ReviewMe.Entrypoints.Review;
 
 /// <summary>
 /// Reviews the code with an automagically chosen target.
 /// </summary>
-public sealed class ReviewAutomatic(ConsoleHost host) : IEntrypoint
+public sealed class ReviewAutomatic(IReviewProvider reviewProvider, IOutputWriter outputWriter) : IEntrypoint
 {
     /// <inheritdoc/>
     public bool Accepts(string[] args) => args is [];
@@ -18,7 +19,7 @@ public sealed class ReviewAutomatic(ConsoleHost host) : IEntrypoint
 
         if (repo.RetrieveStatus().IsDirty)
         {
-            var uncommitted = new ReviewUncommitted(host);
+            var uncommitted = new ReviewUncommitted(reviewProvider, outputWriter);
             return uncommitted.RunAsync(["--uncommitted"]);
         }
 
@@ -30,7 +31,7 @@ public sealed class ReviewAutomatic(ConsoleHost host) : IEntrypoint
                 ? "origin/" + currentBranch.FriendlyName
                 : defaultBranch.FriendlyName;
 
-            var diff = new ReviewDiff(host);
+            var diff = new ReviewDiff(reviewProvider, outputWriter);
             return diff.RunAsync(["--diff", targetBranch]);
         }
 

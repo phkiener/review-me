@@ -10,7 +10,6 @@ await using var serviceProvider = new ServiceCollection()
     .AddEntrypoints()
     .AddReviewProviders()
     .AddOutputWriters()
-    .AddSingleton<ConsoleHost>()
     .BuildServiceProvider();
 
 var features = serviceProvider.GetServices<IEntrypoint>();

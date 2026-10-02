@@ -1,9 +1,16 @@
 namespace ReviewMe.Review;
 
 /// <summary>
-/// A request to review some content.
+/// A full file to review.
 /// </summary>
-/// <param name="FilePath">Path of the file that is to be reviewed.</param>
-/// <param name="Content">The content of the file or a diff of the changes to that file.</param>
-/// <param name="IsDiff">Whether the content is just a diff or the whole content.</param>
-public sealed record ReviewRequest(string FilePath, string Content, bool IsDiff);
+/// <param name="FilePath">The path to the file.</param>
+/// <param name="Content">The full content of the file.</param>
+public sealed record FileContent(string FilePath, string Content);
+
+/// <summary>
+/// A diff, i.e. changes to a file, that should be reviewed.
+/// </summary>
+/// <param name="FilePath">The path to the file.</param>
+/// <param name="UpdatedContent">The current full content of the file.</param>
+/// <param name="Diff">The diff containing changes done to that file.</param>
+public sealed record FileDiff(string FilePath, string UpdatedContent, string Diff);

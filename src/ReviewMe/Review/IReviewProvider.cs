@@ -6,10 +6,18 @@ namespace ReviewMe.Review;
 public interface IReviewProvider : IDisposable
 {
     /// <summary>
-    /// Generate review comments for the given content.
+    /// Generate review comments for the given file.
     /// </summary>
-    /// <param name="request">The content to review.</param>
+    /// <param name="fileContent">The file to review.</param>
     /// <param name="cancellationToken">A <see cref="CancellationToken"/> to abort the operation.</param>
     /// <returns>An asynchronous stream of <see cref="ReviewSuggestion"/>s.</returns>
-    IAsyncEnumerable<ReviewSuggestion> GenerateReviewAsync(ReviewRequest request, CancellationToken cancellationToken);
+    IAsyncEnumerable<ReviewSuggestion> GenerateReviewAsync(FileContent fileContent, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Generate review comments for the given diff.
+    /// </summary>
+    /// <param name="diff">The diff to review.</param>
+    /// <param name="cancellationToken">A <see cref="CancellationToken"/> to abort the operation.</param>
+    /// <returns>An asynchronous stream of <see cref="ReviewSuggestion"/>s.</returns>
+    IAsyncEnumerable<ReviewSuggestion> GenerateReviewAsync(FileDiff diff, CancellationToken cancellationToken);
 }
